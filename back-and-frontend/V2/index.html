@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CETYS Parking</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Modal de Login -->
+        <div v-if="!isLoggedIn" class="login-overlay">
+            <div class="login-modal">
+                <h2 class="login-title">
+                    <span class="cetys">CETYS</span>
+                    <span class="park">Parking</span>
+                </h2>
+                <p class="login-subtitle">Ingresa tus credenciales</p>
+                
+                <div class="login-form">
+                    <div class="form-group">
+                        <label>Matrícula:</label>
+                        <input 
+                            type="text" 
+                            v-model="loginMatricula"
+                            @keyup.enter="handleLogin"
+                            placeholder="Ej: 123456"
+                            class="form-input"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contraseña:</label>
+                        <input 
+                            type="password" 
+                            v-model="loginPassword"
+                            @keyup.enter="handleLogin"
+                            placeholder="********"
+                            class="form-input"
+                        >
+                    </div>
+                    
+                    <div v-if="loginError" class="login-error">
+                        {{ loginError }}
+                    </div>
+                    
+                    <button 
+                        @click="handleLogin"
+                        class="btn btn-login"
+                        :disabled="!loginMatricula || !loginPassword"
+                    >
+                        Iniciar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Header (Visible después del login) -->
+        <div v-if="isLoggedIn" class="header">
+            <div class="header-top">
+                <h1 class="app-title">
+                    <span class="cetys">CETYS</span>
+                    <span class="park">Parking</span>
+                </h1>
+                <div class="user-info">
+                    <span class="user-matricula">👤 {{ currentUser }}</span>
+                    <button @click="handleLogout" class="btn-logout">Salir</button>
+                </div>
+                <div class="clock-display">{{ clockPlaceholder }}</div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button 
+                    class="nav-tab" 
+                    :class="{ active: currentView === 'revisar' }"
+                    @click="currentView = 'revisar'"
+                >
+                    <span class="nav-tab-icon">🚗</span>
+                    <span>Ver Estacionamientos</span>
+                </button>
+                <button 
+                    class="nav-tab"
+                    :class="{ active: currentView === 'reservar' }"
+                    @click="currentView = 'reservar'"
+                >
+                    <span class="nav-tab-icon">🕐</span>
+                    <span>Reservar</span>
+                </button>
+                <button 
+                    class="nav-tab"
+                    :class="{ active: currentView === 'estadisticas' }"
+                    @click="currentView = 'estadisticas'"
+                >
+                    <span class="nav-tab-icon">📊</span>
+                    <span>Ver Estadísticas</span>
+                </button>
+            </nav>
+        </div>
+        
+        <!-- Main Container -->
+        <div v-if="isLoggedIn" class="container">
+            
+            <!-- ============================================ -->
+            <!-- VISTA 1: VER ESTACIONAMIENTOS -->
+            <!-- ============================================ -->
+            <div v-show="currentView === 'revisar'" class="view-revisar">
+                <div class="main-grid">
+                    <!-- Dashboard -->
+                    <aside class="dashboard">
+                        <div class="dash-card libre">
+                            <div class="dash-label">Libres</div>
+                            <div class="dash-value">{{ libresCount }}</div>
+                        </div>
+                        <div class="dash-card ocupado">
+                            <div class="dash-label">Ocupados</div>
+                            <div class="dash-value">{{ ocupadosCount }}</div>
+                        </div>
+                        <div class="dash-card reservado">
+                            <div class="dash-label">Reservados</div>
+                            <div class="dash-value">{{ reservadosCount }}</div>
+                        </div>
+                    </aside>
+                    
+                    <!-- Content -->
+                    <main class="content">
+                        <!-- Selector -->
+                        <section class="selector">
+                            <label>Seleccionar Estacionamiento:</label>
+                            <select v-model="selectedParkingId" @change="onParkingChange">
+                                <option value="1">Estacionamiento Norte - Campus Principal</option>
+                                <option value="2">Estacionamiento Sur - Edificio de Ingeniería</option>
+                            </select>
+                        </section>
+                        
+                        <!-- Section Title -->
+                        <h2 class="section-title">
+                            Cajones de Estacionamiento - {{ selectedParkingName }}
+                        </h2>
+                        
+                        <!-- Parking Spots Grid -->
+                        <div class="spots-grid">
+                            <div 
+                                v-for="spot in currentSpots" 
+                                :key="spot.numero"
+                                class="spot"
+                                :class="spot.estado"
+                            >
+                                {{ spot.numero }}
+                            </div>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-box libre"></div>
+                                <span class="legend-text">Libre</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box ocupado"></div>
+                                <span class="legend-text">Ocupado</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box reservado"></div>
+                                <span class="legend-text">Reservado</span>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+            
+            <!-- ============================================ -->
+            <!-- VISTA 2: RESERVAR -->
+            <!-- ============================================ -->
+            <div v-show="currentView === 'reservar'" class="view-reservar">
+                <div class="reservar-grid">
+                    <!-- Grid de Cajones (Izquierda) -->
+                    <div class="cajones-container">
+                        <!-- Selector -->
+                        <section class="selector">
+                            <label>Seleccionar Estacionamiento:</label>
+                            <select v-model="selectedParkingId" @change="onParkingChange">
+                                <option value="1">Estacionamiento Norte - Campus Principal</option>
+                                <option value="2">Estacionamiento Sur - Edificio de Ingeniería</option>
+                            </select>
+                        </section>
+                        
+                        <h2 class="section-title">Selecciona tu Cajón</h2>
+                        
+                        <!-- Grid Interactivo -->
+                        <div class="spots-grid">
+                            <div 
+                                v-for="spot in currentSpots" 
+                                :key="spot.numero"
+                                class="spot-reservable"
+                                :class="{
+                                    'libre': spot.estado === 'libre',
+                                    'ocupado': spot.estado === 'ocupado',
+                                    'reservado': spot.estado === 'reservado',
+                                    'seleccionado': spot.numero === selectedSpot
+                                }"
+                                @click="selectSpotForReservation(spot)"
+                            >
+                                {{ spot.numero }}
+                                <span v-if="spot.numero === selectedSpot" class="check-icon">✓</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-box libre"></div>
+                                <span class="legend-text">Disponible</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box ocupado"></div>
+                                <span class="legend-text">Ocupado</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box reservado"></div>
+                                <span class="legend-text">Reservado</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box seleccionado"></div>
+                                <span class="legend-text">Tu Selección</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Panel de Reserva (Derecha) -->
+                    <aside class="reserva-panel">
+                        <h3 class="panel-title">Detalles de Reserva</h3>
+                        
+                        <!-- Info del Cajón Seleccionado -->
+                        <div class="reserva-info" v-if="selectedSpot">
+                            <div class="info-item">
+                                <label>Cajón:</label>
+                                <span class="info-value info-value-right">{{ selectedSpot }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Estacionamiento:</label>
+                                <span class="info-value info-value-right">{{ selectedParkingName }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Mensaje si no hay selección -->
+                        <div v-else class="no-selection">
+                            <p>👆 Selecciona un cajón disponible (verde) para continuar</p>
+                        </div>
+                        
+                        <!-- Formulario de Reserva -->
+                        <div v-if="selectedSpot" class="reserva-form">
+                            <!-- Hora Inicio -->
+                            <div class="form-group">
+                                <label>Hora Inicio:</label>
+                                <input 
+                                    type="time" 
+                                    v-model="reservaHoraInicio"
+                                    class="form-input"
+                                >
+                            </div>
+                            
+                            <!-- Hora Fin -->
+                            <div class="form-group">
+                                <label>Hora Fin:</label>
+                                <input 
+                                    type="time" 
+                                    v-model="reservaHoraFin"
+                                    class="form-input"
+                                >
+                            </div>
+                            
+                            <!-- Mensaje de error para horarios inválidos -->
+                            <div v-if="reservaHoraInicio && reservaHoraFin && !isFormValid" class="horario-error">
+                                ⚠️ La hora de fin debe ser posterior a la hora de inicio
+                            </div>
+                            
+                            <!-- Botones -->
+                            <div class="form-actions">
+                                <button 
+                                    @click="confirmarReserva"
+                                    class="btn btn-primary"
+                                    :disabled="!isFormValid"
+                                >
+                                    Confirmar Reserva
+                                </button>
+                                <button 
+                                    @click="cancelarReserva"
+                                    class="btn btn-secondary"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Resumen de Reserva -->
+                        <div v-if="selectedSpot && isFormValid" class="reserva-resumen">
+                            <h4>Resumen:</h4>
+                            <ul>
+                                <li><strong>Cajón:</strong> {{ selectedSpot }}</li>
+                                <li><strong>Horario:</strong> {{ reservaHoraInicio }} - {{ reservaHoraFin }}</li>
+                                <li><strong>Duración:</strong> {{ calcularDuracion() }}</li>
+                                <li><strong>Usuario:</strong> {{ currentUser }}</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Confirmación -->
+                        <div v-if="reservaConfirmada" class="confirmacion-mensaje">
+                            ✅ ¡Reserva confirmada exitosamente!
+                        </div>
+                    </aside>
+                </div>
+            </div>
+            
+            <!-- ============================================ -->
+            <!-- VISTA 3: ESTADÍSTICAS -->
+            <!-- ============================================ -->
+            <div v-show="currentView === 'estadisticas'" class="view-estadisticas">
+                <div class="content">
+                    <h2 class="section-title">Estadísticas de Uso</h2>
+                    
+                    <!-- Selector de Estacionamiento -->
+                    <section class="selector">
+                        <label>Seleccionar Estacionamiento:</label>
+                        <select v-model="selectedParkingId" @change="onParkingChange">
+                            <option value="1">Estacionamiento Norte - Campus Principal</option>
+                            <option value="2">Estacionamiento Sur - Edificio de Ingeniería</option>
+                        </select>
+                    </section>
+                    
+                    <!-- Estadísticas en Tiempo Real -->
+                    <div class="stats-section">
+                        <h3 class="stats-subtitle">📊 Estado Actual</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Tiempo Promedio Ocupado</div>
+                                <div class="stat-value">{{ tiempoPromedioOcupado }}</div>
+                                <div class="stat-desc">Por cajón actualmente ocupado</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Cajón Más Tiempo Ocupado</div>
+                                <div class="stat-value">{{ cajonMasTiempo.numero }}</div>
+                                <div class="stat-desc">{{ cajonMasTiempo.tiempo }}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Rotación Hoy</div>
+                                <div class="stat-value">{{ rotacionHoy }}</div>
+                                <div class="stat-desc">Cambios de estado</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de Cajones Ocupados con Tiempos -->
+                    <div class="stats-section">
+                        <h3 class="stats-subtitle">⏱️ Cajones Ocupados (Tiempo Transcurrido)</h3>
+                        <div class="ocupados-list">
+                            <div 
+                                v-for="spot in cajonesOcupados" 
+                                :key="spot.numero"
+                                class="ocupado-item"
+                            >
+                                <div class="ocupado-numero">{{ spot.numero }}</div>
+                                <div class="ocupado-tiempo">{{ spot.tiempoOcupado }}</div>
+                                <div class="ocupado-barra">
+                                    <div 
+                                        class="ocupado-progreso" 
+                                        :style="{ width: spot.porcentaje + '%' }"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div v-if="cajonesOcupados.length === 0" class="empty-message">
+                                No hay cajones ocupados actualmente
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de Cajones Reservados -->
+                    <div class="stats-section">
+                        <h3 class="stats-subtitle">📅 Cajones Reservados</h3>
+                        <div class="reservados-list">
+                            <div 
+                                v-for="spot in cajonesReservados" 
+                                :key="spot.numero"
+                                class="reservado-item"
+                            >
+                                <div class="reservado-numero">{{ spot.numero }}</div>
+                                <div class="reservado-tiempo">{{ spot.tiempoReservado }}</div>
+                                <div class="reservado-barra">
+                                    <div 
+                                        class="reservado-progreso" 
+                                        :style="{ width: spot.porcentaje + '%' }"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div v-if="cajonesReservados.length === 0" class="empty-message">
+                                No hay cajones reservados actualmente
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Predicción por Hora -->
+                    <div class="stats-section">
+                        <h3 class="stats-subtitle">🔮 Predicción de Disponibilidad</h3>
+                        <div class="prediccion-container">
+                            <div class="form-group">
+                                <label>Selecciona una hora para ver disponibilidad promedio:</label>
+                                <input 
+                                    type="time" 
+                                    v-model="horaConsulta"
+                                    class="form-input"
+                                >
+                            </div>
+                            
+                            <div v-if="horaConsulta" class="prediccion-resultado">
+                                <div class="prediccion-header">
+                                    <h4>Pronóstico para las {{ horaConsulta }}</h4>
+                                    <p class="prediccion-nota">Basado en datos históricos</p>
+                                </div>
+                                
+                                <div class="prediccion-stats">
+                                    <div class="prediccion-stat">
+                                        <div class="prediccion-label">Disponibles (promedio)</div>
+                                        <div class="prediccion-value libre">{{ prediccionHora.libres }}</div>
+                                    </div>
+                                    <div class="prediccion-stat">
+                                        <div class="prediccion-label">Ocupados (promedio)</div>
+                                        <div class="prediccion-value ocupado">{{ prediccionHora.ocupados }}</div>
+                                    </div>
+                                    <div class="prediccion-stat">
+                                        <div class="prediccion-label">Disponibilidad</div>
+                                        <div class="prediccion-value">{{ prediccionHora.porcentaje }}%</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Grid de Cajones con Predicción -->
+                                <div class="prediccion-grid">
+                                    <h5>Cajones generalmente disponibles:</h5>
+                                    <div class="mini-spots-grid">
+                                        <div 
+                                            v-for="spot in prediccionHora.cajonesLibres" 
+                                            :key="spot"
+                                            class="mini-spot disponible"
+                                        >
+                                            {{ spot }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Vue desde CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="./index.js"></script>
+</body>
+</html>

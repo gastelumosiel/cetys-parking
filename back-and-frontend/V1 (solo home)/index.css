@@ -1,0 +1,417 @@
+/* Reset and Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+
+#app {
+    min-height: 100vh;
+}
+
+/* Header con gradiente fade */
+.header {
+    background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+    color: white;
+    padding: 24px 50px 0 50px;
+    position: relative;
+    z-index: 100;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.app-title {
+    font-size: 3.5em;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+    text-align: center;
+    flex: 1;
+}
+
+.app-title .cetys {
+    font-weight: 700;
+}
+
+.app-title .park {
+    font-style: italic;
+    font-weight: 300;
+}
+
+.clock-display {
+    font-size: 2em;
+    font-weight: 400;
+    letter-spacing: 1px;
+    position: absolute;
+    right: 50px;
+    top: 28px;
+}
+
+/* Navigation Tabs - mismo fondo que header para continuidad */
+.nav-tabs {
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    align-items: center;
+    /* Sin background aquí - hereda del header */
+}
+
+.nav-tab {
+    flex: 1;
+    max-width: 280px;
+    padding: 14px 35px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-size: 0.85em;
+    font-weight: 400;
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    margin: 0 4px;
+}
+
+.nav-tab:not(:last-child)::after {
+    content: '|';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.5em;
+    font-weight: 200;
+    pointer-events: none;
+}
+
+.nav-tab:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.nav-tab.active {
+    font-weight: 600;
+    border-bottom-color: white;
+}
+
+.nav-tab-icon {
+    font-size: 1.1em;
+}
+
+/* Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Main Grid Layout */
+.main-grid {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* Dashboard Sidebar */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dash-card {
+    background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
+    padding: 28px;
+    border-radius: 12px;
+    text-align: center;
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.dash-card:hover {
+    transform: translateX(3px);
+    background: linear-gradient(135deg, #303030 0%, #2a2a2a 100%);
+}
+
+.dash-card.libre {
+    border-left-color: #4caf50;
+}
+
+.dash-card.ocupado {
+    border-left-color: #f44336;
+}
+
+.dash-card.reservado {
+    border-left-color: #ff9800;
+}
+
+.dash-label {
+    font-size: 0.95em;
+    color: #aaaaaa;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+}
+
+.dash-value {
+    font-size: 5em;
+    font-weight: 200;
+    color: #ffffff;
+    line-height: 1;
+}
+
+/* Content Area */
+.content {
+    background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
+    padding: 40px;
+    border-radius: 12px;
+}
+
+/* Selector */
+.selector {
+    margin-bottom: 30px;
+}
+
+.selector label {
+    display: block;
+    margin-bottom: 14px;
+    font-weight: 500;
+    font-size: 1.05em;
+    color: #e0e0e0;
+}
+
+.selector select {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1em;
+    border: 1px solid #444444;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #151515 100%);
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.selector select:focus {
+    outline: none;
+    border-color: #ffb74d;
+    background: linear-gradient(135deg, #202020 0%, #1a1a1a 100%);
+}
+
+.selector select option {
+    background: #1a1a1a;
+    color: #e0e0e0;
+    padding: 12px;
+}
+
+/* Section Title */
+.section-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    color: #e0e0e0;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Parking Spots Grid */
+.spots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto 30px auto;
+}
+
+.spot {
+    aspect-ratio: 1.4;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: 300;
+    color: white;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.spot:hover {
+    transform: translateY(-4px);
+}
+
+.spot.libre {
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+}
+
+.spot.ocupado {
+    background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+}
+
+.spot.reservado {
+    background: linear-gradient(135deg, #ff9800 0%, #e65100 100%);
+}
+
+/* Legend */
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 45px;
+    padding-top: 30px;
+    margin-top: 35px;
+    border-top: 1px solid #444444;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.legend-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+}
+
+.legend-box.libre {
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+}
+
+.legend-box.ocupado {
+    background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+}
+
+.legend-box.reservado {
+    background: linear-gradient(135deg, #ff9800 0%, #e65100 100%);
+}
+
+.legend-text {
+    font-weight: 400;
+    color: #e0e0e0;
+    font-size: 1.05em;
+}
+
+/* Debug Panel */
+.debug {
+    background: #333333;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #00ff00;
+}
+
+.debug strong {
+    color: #ffff00;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+        padding: 30px;
+    }
+    
+    .dashboard {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+    
+    .dash-card {
+        min-width: 200px;
+    }
+    
+    .clock-display {
+        position: static;
+        text-align: center;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 20px 30px 0 30px;
+    }
+    
+    .clock-display {
+        right: 30px;
+        top: 20px;
+    }
+    
+    .app-title {
+        font-size: 2em;
+    }
+    
+    .nav-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .nav-tab {
+        padding: 12px 20px;
+        font-size: 0.9em;
+    }
+    
+    .spots-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 18px 20px 0 20px;
+    }
+    
+    .clock-display {
+        font-size: 1.5em;
+        right: 20px;
+        top: 18px;
+    }
+    
+    .container {
+        padding: 20px;
+    }
+    
+    .nav-tab {
+        flex: 1;
+        padding: 12px 10px;
+        font-size: 0.85em;
+    }
+    
+    .spots-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dash-value {
+        font-size: 3em;
+    }
+    
+    .legend {
+        flex-direction: column;
+        gap: 18px;
+    }
+}

@@ -1,0 +1,366 @@
+[
+    {
+        "id": "d5dcc581e12e9041",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5413d3a766904e70",
+        "type": "uibuilder",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "topic": "",
+        "url": "uitestestacio",
+        "okToGo": true,
+        "fwdInMessages": false,
+        "allowScripts": false,
+        "allowStyles": false,
+        "copyIndex": true,
+        "templateFolder": "ext-iife-vue3-nobuild",
+        "extTemplate": "TotallyInformation/uib-template-iife-vue3-nobuild",
+        "showfolder": false,
+        "reload": false,
+        "sourceFolder": "src",
+        "deployedVersion": "7.5.0",
+        "showMsgUib": false,
+        "title": "",
+        "descr": "",
+        "editurl": "vscode://file/\\Users\\renel\\.node-red\\projects\\EstacionamientoProyecto1\\uibuilder/uitestestacio/?windowId=_blank",
+        "x": 600,
+        "y": 320,
+        "wires": [
+            [
+                "69393ab5c75c2eea",
+                "9d35998b48dd570f"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4fb7a1024b204d04",
+        "type": "mqtt in",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "topic": "device1/tx",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "7e22c42101ac0e10",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 200,
+        "y": 320,
+        "wires": [
+            [
+                "8cb6662fe6254354",
+                "a6df82d4641d6b40"
+            ]
+        ]
+    },
+    {
+        "id": "8cb6662fe6254354",
+        "type": "change",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "spot-status-change",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 320,
+        "wires": [
+            [
+                "5413d3a766904e70"
+            ]
+        ]
+    },
+    {
+        "id": "11737a1c24986667",
+        "type": "inject",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "INSERT INTO users (email, bio, country) VALUES (?, ?, ?);",
+        "payload": "[\"proyecto@test.com\",\"i love chocolate\",\"MX\"]",
+        "payloadType": "json",
+        "x": 130,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e57eb5ab79114346",
+        "type": "mysql",
+        "z": "d5dcc581e12e9041",
+        "mydb": "f3552c043dc86670",
+        "name": "",
+        "x": 1000,
+        "y": 380,
+        "wires": [
+            [
+                "0465711a3d2735d9"
+            ]
+        ]
+    },
+    {
+        "id": "3b74fb13c71fb659",
+        "type": "inject",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "spot-status-change",
+        "payload": "{   \"parkingId\": \"2\",   \"spotId\": 8,   \"spotNumber\": \"PS008\",   \"estado\": \"libre\",   \"timestamp\": 1764737957000 }",
+        "payloadType": "json",
+        "x": 290,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a6df82d4641d6b40",
+        "type": "change",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "INSERT INTO EntradasSalidas(parkingId, spotId, spotNumber, estado, ttimestamp) VALUES (:parkingId, :spotId, :spotNumber, :estado, :timestamp);",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 800,
+        "y": 380,
+        "wires": [
+            [
+                "e57eb5ab79114346"
+            ]
+        ]
+    },
+    {
+        "id": "69393ab5c75c2eea",
+        "type": "debug",
+        "z": "d5dcc581e12e9041",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "0465711a3d2735d9",
+        "type": "debug",
+        "z": "d5dcc581e12e9041",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1200,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "9d35998b48dd570f",
+        "type": "switch",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "spot-status-change",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 790,
+        "y": 320,
+        "wires": [
+            [
+                "a6df82d4641d6b40",
+                "a16e9a204094bc69"
+            ]
+        ]
+    },
+    {
+        "id": "a16e9a204094bc69",
+        "type": "mqtt out",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "topic": "device1/rx",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "7e22c42101ac0e10",
+        "x": 1010,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "fc5d3e068b1cd90b",
+        "type": "inject",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM EntradasSalidas;",
+        "x": 720,
+        "y": 440,
+        "wires": [
+            [
+                "e57eb5ab79114346"
+            ]
+        ]
+    },
+    {
+        "id": "b4494c60643f1c05",
+        "type": "inject",
+        "z": "d5dcc581e12e9041",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM EntradasSalidas WHERE ttimestamp > ? ;",
+        "payload": "[1764754662512]",
+        "payloadType": "json",
+        "x": 820,
+        "y": 480,
+        "wires": [
+            [
+                "e57eb5ab79114346"
+            ]
+        ]
+    },
+    {
+        "id": "7e22c42101ac0e10",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "9d16db8b68e94effb8f5ad906a9fe5eb.s1.eu.hivemq.cloud",
+        "port": "8883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "5",
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "f3552c043dc86670",
+        "type": "MySQLdatabase",
+        "name": "misqldb",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "espacios",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "60581048ae68d237",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-uibuilder": "7.5.0",
+            "node-red-node-mysql": "2.0.0"
+        }
+    }
+]

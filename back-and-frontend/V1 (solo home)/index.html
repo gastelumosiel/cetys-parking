@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CETYS Park</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <div class="header-top">
+                <h1 class="app-title">
+                    <span class="cetys">CETYS </span> 
+                    <span class="park">Parking</span>
+                </h1>
+                <div class="clock-display">{{ clockPlaceholder }}</div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button 
+                    class="nav-tab" 
+                    :class="{ active: currentView === 'revisar' }"
+                    @click="currentView = 'revisar'"
+                >
+                    <span class="nav-tab-icon">🚗</span>
+                    <span>Ver Estacionamientos</span>
+                </button>
+                <button 
+                    class="nav-tab"
+                    :class="{ active: currentView === 'reservar' }"
+                    @click="currentView = 'reservar'"
+                >
+                    <span class="nav-tab-icon">🕐</span>
+                    <span>Reservar</span>
+                </button>
+                <button 
+                    class="nav-tab"
+                    :class="{ active: currentView === 'estadisticas' }"
+                    @click="currentView = 'estadisticas'"
+                >
+                    <span class="nav-tab-icon">📊</span>
+                    <span>Ver Estadísticas</span>
+                </button>
+            </nav>
+        </div>
+        
+        <div class="container">
+            <div class="main-grid">
+                <!-- Dashboard -->
+                <div class="dashboard">
+                    <div class="dash-card libre">
+                        <div class="dash-label">Libres</div>
+                        <div class="dash-value">{{ libresCount }}</div>
+                    </div>
+                    <div class="dash-card ocupado">
+                        <div class="dash-label">Ocupados</div>
+                        <div class="dash-value">{{ ocupadosCount }}</div>
+                    </div>
+                    <div class="dash-card reservado">
+                        <div class="dash-label">Reservados</div>
+                        <div class="dash-value">{{ reservadosCount }}</div>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="content">
+                    <div class="selector">
+                        <label>Seleccionar Estacionamiento:</label>
+                        <select v-model="selectedParkingId" @change="onParkingChange">
+                            <option value="1">Estacionamiento Norte - Campus Principal</option>
+                            <option value="2">Estacionamiento Sur - Edificio de Ingeniería</option>
+                        </select>
+                    </div>
+                    
+                    <h2 class="section-title">{{ selectedParkingName }}</h2>
+                    
+                    <div class="spots-grid">
+                        <div 
+                            v-for="spot in currentSpots" 
+                            :key="spot.numero"
+                            class="spot"
+                            :class="spot.estado"
+                        >
+                            {{ spot.numero }}
+                        </div>
+                    </div>
+                    
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-box libre"></div>
+                            <span class="legend-text">Libre</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box ocupado"></div>
+                            <span class="legend-text">Ocupado</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box reservado"></div>
+                            <span class="legend-text">Reservado</span>
+                        </div>
+                    </div>
+                    
+                    <div class="debug">
+                        <strong>Debug Info:</strong><br>
+                        Selected: {{ selectedParkingId }}<br>
+                        Spots loaded: {{ currentSpots.length }}<br>
+                        Data: {{ currentSpots.map(s => s.numero + ':' + s.estado).join(', ') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue desde CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
